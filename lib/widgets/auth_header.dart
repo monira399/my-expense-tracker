@@ -5,7 +5,8 @@ import '../utils/app_color.dart';
 
 class AuthHeader extends StatelessWidget {
   final Widget child;
-  const AuthHeader({super.key, required this.child});
+  final String subText;
+  const AuthHeader({super.key, required this.child, required this.subText});
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +14,12 @@ class AuthHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+
+        const SizedBox(height: 48),
+
         Container(
-          height: 90,
-          width: 90,
+          height: 70,
+          width: 70,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
           child: Image.asset('assets/images/logo_l.png', fit: BoxFit.contain),
         ),
@@ -26,7 +30,7 @@ class AuthHeader extends StatelessWidget {
             Text(
               'Expense',
               style: GoogleFonts.poppins(
-                fontSize: 25,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
@@ -35,7 +39,7 @@ class AuthHeader extends StatelessWidget {
             Text(
               'Tracker',
               style: GoogleFonts.poppins(
-                fontSize: 25,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primary,
               ),
@@ -43,12 +47,14 @@ class AuthHeader extends StatelessWidget {
           ],
         ),
 
+        SizedBox(height: 10),
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Text(
-            'Track your income, manage expenses and save more',
+            subText,
             style: GoogleFonts.poppins(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
             ),

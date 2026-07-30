@@ -12,7 +12,7 @@ class ExpenseTracker extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme().copyWith(
           headlineLarge: const TextStyle(
-            fontSize: 32,
+            fontSize: 18,
             fontWeight: FontWeight.bold
           ),
 
@@ -24,7 +24,6 @@ class ExpenseTracker extends StatelessWidget {
           bodyMedium: const TextStyle(
             fontSize: 16,
             color: Colors.black,
-            fontWeight: FontWeight.bold
           )
         )
       ),
