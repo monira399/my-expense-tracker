@@ -2,6 +2,7 @@ import 'package:expense_tracker/screens/profile_screen.dart';
 import 'package:expense_tracker/screens/report_screen.dart';
 import 'package:expense_tracker/screens/transaction_screen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
+import 'package:expense_tracker/widgets/add_transaction_bottom_sheet.dart';
 import 'package:expense_tracker/widgets/main_navigation_app_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex =0;
+  int _currentIndex = 0;
 
   final List<Widget> _screens = [
     DashboardScreen(),
@@ -30,8 +31,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-          onPressed: (){},
-      child: Icon(Icons.add, color: AppColors.white),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            builder: (context) => AddTransactionBottomSheet(),
+          );
+        },
+        child: Icon(Icons.add, color: AppColors.white),
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -43,7 +54,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             _currentIndex = index;
           });
         },
-
       ),
     );
   }
