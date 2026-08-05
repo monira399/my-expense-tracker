@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CurrentIncomeCard extends StatelessWidget {
+class CurrentBalancedCard extends StatelessWidget {
   final String title;
   final int amount;
   final Color color;
@@ -16,7 +16,7 @@ class CurrentIncomeCard extends StatelessWidget {
   final Color? iconColor;
   final double? iconSize;
 
-  const CurrentIncomeCard({
+  const CurrentBalancedCard({
     super.key,
     required this.title,
     required this.amount,
@@ -24,13 +24,16 @@ class CurrentIncomeCard extends StatelessWidget {
     required this.icon,
     this.height,
     this.width,
-    this.fontSize, this.fontColor, this.iconSize, this.iconColor, required this.color,
+    this.fontSize,
+    this.fontColor,
+    this.iconSize,
+    this.iconColor,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(12),
       padding: EdgeInsets.all(16),
       height: height,
       width: width,
@@ -51,33 +54,38 @@ class CurrentIncomeCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style:GoogleFonts.poppins(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.w500
-              ) ,),
-              Text('৳ ${amount.toString()}', style: GoogleFonts.poppins(
-                fontSize: fontSize ?? 20,
-                fontWeight: FontWeight.bold,
-                color: fontColor ?? Colors.black
-              ),),
-              Text(date,style: GoogleFonts.poppins(
-                  fontSize:20,
-                  color: fontColor ?? Colors.black
-              ),)
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '৳ ${amount.toString()}',
+                style: GoogleFonts.poppins(
+                  fontSize: fontSize ?? 18,
+                  fontWeight: FontWeight.bold,
+                  color: fontColor ?? Colors.black,
+                ),
+              ),
+              Text(
+                date,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: fontColor ?? Colors.black,
+                ),
+              ),
             ],
           ),
           CircleAvatar(
+            backgroundColor: AppColors.white,
             radius: 45,
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: iconSize ?? 15,
-
-            ),
-          )
+            child: Icon(icon, color: iconColor, size: iconSize ?? 15),
+          ),
         ],
-      )
+      ),
     );
   }
 }

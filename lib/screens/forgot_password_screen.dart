@@ -27,43 +27,46 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       body: AuthBackground(
           child:SingleChildScrollView(
-            child: AuthHeader(
-                subText: 'Manage your money, smartly',
-                child:Center(
-                  child: Column(
-                   mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 40),
-                      AuthTitle(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                 mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset('assets/images/logo_l.png', height: 80, width: 80, fit: BoxFit.contain,),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: AuthTitle(
                           title: 'Forgot Password',
                           subTitle: 'Enter your email to reset your password.'),
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: ForgotPasswordCard(
-                            emailAddressController: _emailAddressController),
-                      ),
-                      Center(
-                        child: RichText(text: TextSpan(
-                            text: 'Don\'t receive the email?  ',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            children: [
-                              TextSpan(
-                                  text: 'Resend Link',
-                                  style: TextStyle(
-                                      color: AppColors.primary
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen(), ),
-                                              (predicate) => false);
-                                    }
-                              )
-                            ]
-                        )),
-                      )
-                    ],
-                  ),
-                )
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: ForgotPasswordCard(
+                          emailAddressController: _emailAddressController),
+                    ),
+                    Center(
+                      child: RichText(text: TextSpan(
+                          text: 'Don\'t receive the email?  ',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          children: [
+                            TextSpan(
+                                text: 'Resend Link',
+                                style: TextStyle(
+                                    color: AppColors.primary
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen(), ),
+                                            (predicate) => false);
+                                  }
+                            )
+                          ]
+                      )),
+                    )
+                  ],
+                ),
+              ),
             ),
           ) ),
     );

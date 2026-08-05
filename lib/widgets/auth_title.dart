@@ -12,9 +12,9 @@ class AuthTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.headlineLarge),
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
         SizedBox(height: 5),
         Text(
           subTitle,

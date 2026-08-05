@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SummaryCard extends StatelessWidget {
+class ReportSummaryCard extends StatelessWidget {
   final String title;
   final double amount;
-  final String? percentage;
-  final String? subTitle;
-
-  final IconData? icon;
+  final IconData icon;
   final Color iconColor;
   final Color iconBackgroundColor;
-
+  final Color backgroundColor;
   final Color amountColor;
 
-  const SummaryCard({
+  const ReportSummaryCard({
     super.key,
     required this.title,
     required this.amount,
-    this.percentage,
-    this.subTitle,
-    this.icon,
+    required this.icon,
     required this.iconColor,
     required this.iconBackgroundColor,
     this.amountColor = Colors.black,
+    required this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 180,
-      width: double.infinity,
+      height: 105,
+      width: 250,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -46,66 +42,39 @@ class SummaryCard extends StatelessWidget {
         children: [
           /// Icon
           CircleAvatar(
-            radius: 25,
+            radius: 15,
             backgroundColor: iconBackgroundColor,
             child: Icon(
               icon,
               color: iconColor,
-              size: 28,
+              size: 18,
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
 
           /// Text
           Text(
             title,
             style: GoogleFonts.poppins(
-              fontSize: 15,
+              fontSize: 10,
               fontWeight: FontWeight.w400,
               color: Colors.black,
             ),
           ),
 
 
-          const SizedBox(height: 5),
+          const SizedBox(height: 2),
 
           Text(
             '৳ ${amount.toStringAsFixed(0)}',
             style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
               color: amountColor,
             ),
           ),
 
-
-          const SizedBox(height: 5),
-
-          Row(
-            children: [
-              Text(
-                percentage ?? '',
-                style: GoogleFonts.poppins(
-                  color: iconColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-
-              const SizedBox(width: 3),
-
-              Text(
-                subTitle ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
-                  color: Colors.grey,
-                  fontSize: 12
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

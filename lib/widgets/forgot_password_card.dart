@@ -27,7 +27,7 @@ class ForgotPasswordCard extends StatelessWidget {
             color: Colors.black.withOpacity(0.2),
             blurRadius: 20,
             spreadRadius: 2,
-            offset: const Offset(0, 0), // চারদিকে shadow
+            offset: const Offset(0, 0),
           ),
         ],
       ),

@@ -13,15 +13,23 @@ class TransactionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(transaction.prefixIcon),
-      title: Text(transaction.title, style: Theme.of(context).textTheme.titleMedium,),
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundColor: transaction.category.color.withOpacity(0.15),
+        child: Icon(
+          transaction.category.icon,
+          color: transaction.category.color,
+          size: 16,
+        ),
+      ),
+      title: Text(transaction.title, style: Theme.of(context).textTheme.titleMedium),
       subtitle: Text('${transaction.date.day}/${transaction.date.month}/${transaction.date.year}'),
       trailing: Row(
         mainAxisSize:MainAxisSize.min,
         children: [
           Text('${transaction.isIncome ? '+' : '-'} ৳ ${transaction.amount}', style:GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 12,
             color: transaction.isIncome ? Colors.green : Colors.red
           ) ),
           SizedBox(width:15 ),

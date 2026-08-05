@@ -15,8 +15,10 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 25),
               
                   CustomTextField(
-                    controller: _emailController,
+                    controller: _fullNameController,
                     hintText: 'Full Name',
                     prefixIcon: Icons.person,
                     height: 55,
@@ -48,7 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 20),
               
                   CustomTextField(
-                    controller: _passwordController,
+                    controller: _emailController,
                     hintText: 'Email',
                     prefixIcon: Icons.email,
                     height: 55,
@@ -58,7 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 20),
               
                   CustomTextField(
-                    controller: _emailController,
+                    controller: _passwordController,
                     hintText: 'Password',
                     prefixIcon: Icons.lock_outline,
                     suffixIcon: Icons.visibility,
@@ -69,12 +71,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 20),
               
                   CustomTextField(
-                    height: 55,
-                    width: double.infinity,
-                    controller: _passwordController,
+                    controller: _confirmPasswordController,
                     hintText: 'Confirm Password',
                     prefixIcon: Icons.lock_outline,
                     suffixIcon: Icons.visibility,
+                    height: 55,
+                    width: double.infinity,
                   ),
 
                   SizedBox(height: 20),
