@@ -1,5 +1,5 @@
 import 'package:expense_tracker/app.dart';
-import 'package:expense_tracker/firebase_options.dart';
+import 'package:expense_tracker/services/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 

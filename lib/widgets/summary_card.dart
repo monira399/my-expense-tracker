@@ -95,13 +95,15 @@ class SummaryCard extends StatelessWidget {
 
               const SizedBox(width: 3),
 
-              Text(
-                subTitle ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
-                  color: Colors.grey,
-                  fontSize: 12
+              Center(
+                child: Text(
+                  subTitle ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey,
+                    fontSize: 12
+                  ),
                 ),
               ),
             ],

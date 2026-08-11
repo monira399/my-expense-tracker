@@ -24,8 +24,8 @@ class ReportSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 105,
-      width: 250,
+      height: 120,
+      width: 300,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,

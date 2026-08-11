@@ -1,6 +1,10 @@
-import 'package:expense_tracker/models/transaction_model.dart';
+
+import 'package:expense_tracker/provider/category_provider.dart';
+import 'package:expense_tracker/screens/transaction_screen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../provider/transaction_provider.dart';
 import '../widgets/current_balanced_card.dart';
 import '../widgets/summary_card.dart';
 
@@ -12,8 +16,22 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      context.read<TransactionProvider>().getTransaction();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final transactionProvider = context.watch<TransactionProvider>();
+    final recentTransactions = context.watch<TransactionProvider>().recentTransactions;
+
+
     return Scaffold(
       appBar: AppBar(
         leading: Icon(Icons.menu),
@@ -52,7 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 height: 120,
                 width: double.infinity,
                 title: 'Current Balance',
-                amount: 4500,
+                amount: transactionProvider.currentBalance,
                 date: '26 july, 2026',
                 fontSize: 20,
                 fontColor: Colors.white,
@@ -69,7 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: SummaryCard(
                       title: 'Total Income',
-                      amount: 18290,
+                      amount: transactionProvider.totalIncome,
                       percentage: '8.3%',
                       subTitle: 'from last month',
                       icon: Icons.arrow_upward,
@@ -82,10 +100,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Expanded(
                     child: SummaryCard(
                       title: 'Total Expense',
-                      amount: 18290,
+                      amount: transactionProvider.totalExpense,
                       percentage: '8.3%',
                       subTitle: 'from last month',
                       icon: Icons.arrow_downward,
+                      iconColor: Colors.red,
+                      iconBackgroundColor: const Color(0xffFDEBEC),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20,),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: SummaryCard(
+                      title: 'Income',
+                      amount: transactionProvider.thisMonthIncome,
+                      percentage: '',
+                      subTitle: 'this month',
+                      icon: Icons.calendar_month_outlined,
+                      iconColor: Colors.green,
+                      iconBackgroundColor: AppColors.secondary.withOpacity(0.2),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  Expanded(
+                    child: SummaryCard(
+                      title: 'Expense',
+                      amount: transactionProvider.thisMonthExpense,
+                      percentage: '',
+                      subTitle: 'this month',
+                      icon: Icons.calendar_month_outlined,
                       iconColor: Colors.red,
                       iconBackgroundColor: const Color(0xffFDEBEC),
                     ),
@@ -104,10 +153,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Row(
                     children: [
-                      Text(
-                        'View All',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                      TextButton(onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionScreen()));
+                      }, child:Text('View All') ),
                       SizedBox(width: 4,),
                       Icon(Icons.arrow_forward, size: 20, color: Colors.grey,),
 
@@ -119,21 +167,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ListView.separated(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: transactionList.length,
+                itemCount: recentTransactions.length,
                 itemBuilder: (context, index) {
-                  final transaction = transactionList[index];
+                  final transaction = recentTransactions[index];
+
+                  final category = context.read<CategoryProvider>().getCategoryById(transaction.categoryId);
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: transaction.category.color.withOpacity(
-                        0.2,
-                      ),
+                      backgroundColor: category?.color.withOpacity(0.15) ?? AppColors.secondary.withOpacity(0.15),
                       child: Icon(
-                        transaction.category.icon,
-                        color: transaction.category.color,
+                        category?.icon ?? Icons.category_outlined,
+                        color: category?.color ?? AppColors.secondary,
                       ),
                     ),
                     title: Text(transaction.title),
-                    subtitle: Text(transaction.category.name),
+                    subtitle: Text(category?.name ?? 'Unknown'),
 
                     trailing: Text(
                       transaction.isIncome
@@ -141,6 +189,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           : "- ${transaction.amount}",
                       style: TextStyle(
                         color: transaction.isIncome ? Colors.green : Colors.red,
+                        fontSize: 15
                       ),
                     ),
                   );

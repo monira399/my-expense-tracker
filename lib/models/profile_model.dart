@@ -6,8 +6,10 @@ class ProfileUserModel {
   final String? subTitle;
   final IconData icon;
   final Color? iconColor;
+  final bool isLogOut;
 
   ProfileUserModel({
+    this.isLogOut = false,
     this.iconColor,
     required this.title,
     this.subTitle,
@@ -52,6 +54,7 @@ List<ProfileUserModel> profileMenuList =[
   ProfileUserModel(
       title: 'LogOut ',
       icon: Icons.logout,
-      iconColor: AppColors.error.withOpacity(0.5)
+      iconColor: AppColors.error,
+      isLogOut: true,
   )
 ];

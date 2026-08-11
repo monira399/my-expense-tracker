@@ -1,18 +1,21 @@
+import 'package:expense_tracker/screens/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../utils/app_color.dart';
 import 'custom_button.dart';
 import 'custom_textfield.dart';
 
 class ForgotPasswordCard extends StatelessWidget {
+  final VoidCallback onTapResetPassword;
+  final TextEditingController emailAddressController;
+
   const ForgotPasswordCard({
     super.key,
-    required TextEditingController emailAddressController,
-  }) : _emailAddressController = emailAddressController;
+    required this.emailAddressController,
+    required this.onTapResetPassword,
+  }) ;
 
-  final TextEditingController _emailAddressController;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +40,7 @@ class ForgotPasswordCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             CustomTextField(
-              controller: _emailAddressController,
+              controller: emailAddressController,
               hintText: 'Email Address',
               prefixIcon: Icons.email_outlined,
               height: 55,
@@ -48,7 +51,7 @@ class ForgotPasswordCard extends StatelessWidget {
 
             CustomButton(
               text: 'Send Reset Link',
-              onPressed: () {},
+              onPressed: onTapResetPassword,
               icon: Icons.near_me_rounded,
             ),
 
@@ -92,7 +95,9 @@ class ForgotPasswordCard extends StatelessWidget {
               height: 55,
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen()), (predicate)=>false);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.background,
                   foregroundColor: AppColors.primary,

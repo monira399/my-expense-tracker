@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class CurrentBalancedCard extends StatelessWidget {
   final String title;
-  final int amount;
+  final double amount;
   final Color color;
   final String date;
   final IconData icon;

@@ -1,8 +1,12 @@
 import 'package:expense_tracker/utils/app_color.dart';
+import 'package:expense_tracker/widgets/custom_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../models/profile_model.dart';
+import '../provider/auth_provider.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -144,15 +148,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final profileMenu = profileMenuList[index];
 
                     return ListTile(
+
                       leading: CircleAvatar(
-                        radius: 20,
+                        radius: 22,
                         backgroundColor: profileMenu.iconColor != null
                        ? profileMenu.iconColor!.withOpacity(0.1)
                         : AppColors.secondary.withOpacity(.1),
                         child: Icon(
                           profileMenu.icon,
                           color:profileMenu.iconColor ?? AppColors.primary,
-                          size: 20,
+                          size: 22,
                         ),
                       ),
                       title:
@@ -160,20 +165,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         profileMenu.title,
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                          fontSize: 15,
                           color: profileMenu.iconColor ?? Colors.black
                         ),
                       ),
                       subtitle:profileMenu.subTitle == null
                       ? null :
                       Text(profileMenu.subTitle!,style: GoogleFonts.poppins(
-                        fontSize: 10
+                        fontSize: 12
                       ),),
                       trailing: const Icon(
                         Icons.arrow_forward_ios,
                         size: 16,
                       ),
-                      onTap: () {},
+                      onTap: () {
+                        _onTapProfileMenu(profileMenu);
+                      },
                     );
                   },
                 ),
@@ -182,6 +189,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _onTapProfileMenu(ProfileUserModel profileMenu) {
+    if(profileMenu.isLogOut) {
+      _showLogoutDialog();
+      return;
+    }
+  }
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return CustomConfirmationDialog(
+            title: 'LogOut',
+            message: 'Do you want to logout?',
+            confirmText: 'Logout',
+            onConfirm: () async {
+              await context.read<AuthProvider>().logOut();
+
+              if(!mounted) return;
+
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginScreen()), (predicate) => false);
+            });
+      },
     );
   }
 }

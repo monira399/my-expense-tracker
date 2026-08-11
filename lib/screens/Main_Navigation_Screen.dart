@@ -1,11 +1,12 @@
 import 'package:expense_tracker/models/transaction_model.dart';
+import 'package:expense_tracker/provider/transaction_provider.dart';
 import 'package:expense_tracker/screens/profile_screen.dart';
 import 'package:expense_tracker/screens/report_screen.dart';
 import 'package:expense_tracker/screens/transaction_screen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
 import 'package:expense_tracker/widgets/main_navigation_app_bar.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'add_transaction_screen.dart';
 import 'dashboard_screen.dart';
 
@@ -44,12 +45,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
           print(transaction);
 
-          if(transaction != null) {
+          if (transaction != null) {
             print("Received");
-            setState(() {
-              transactionList.add(transaction);
-            });
 
+            await context
+                .read<TransactionProvider>()
+                .addTransaction(transaction);
           }
         },
         child: Icon(Icons.add, color: AppColors.white),
