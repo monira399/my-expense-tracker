@@ -44,7 +44,7 @@ class _ExpenseIncomeToggleBarState extends State<ExpenseIncomeToggleBar> {
                   borderRadius: BorderRadius.circular(16),
 
                 ),
-                child: Text('Income', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: isSelected == 0 ? AppColors.white : Colors.black,) ),
+                child: Text('Income', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: isSelected == 0 ? AppColors.white : Colors.black87,) ),
 
               ),
             ),
@@ -66,7 +66,7 @@ class _ExpenseIncomeToggleBarState extends State<ExpenseIncomeToggleBar> {
                     color: isSelected == 1 ? AppColors.primary : AppColors.white,
                   borderRadius: BorderRadius.circular(16)
                 ),
-                child: Text('Expense',style: Theme.of(context).textTheme.titleMedium?.copyWith(color: isSelected == 1 ? AppColors.white : Colors.black,) ),
+                child: Text('Expense',style: Theme.of(context).textTheme.titleMedium?.copyWith(color: isSelected == 1 ? AppColors.white : Colors.black87,) ),
 
               ),
             ),

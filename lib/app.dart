@@ -1,5 +1,6 @@
 import 'package:expense_tracker/provider/auth_provider.dart';
 import 'package:expense_tracker/provider/category_provider.dart';
+import 'package:expense_tracker/provider/profile_provider.dart';
 import 'package:expense_tracker/provider/transaction_provider.dart';
 import 'package:expense_tracker/screens/splashscreen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
@@ -17,6 +18,7 @@ class ExpenseTracker extends StatelessWidget {
        ChangeNotifierProvider(create: (_) => AuthProvider()),
        ChangeNotifierProvider(create: (_) => CategoryProvider()),
        ChangeNotifierProvider(create: (_) => TransactionProvider()),
+       ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

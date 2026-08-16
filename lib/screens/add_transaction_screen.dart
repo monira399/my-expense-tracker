@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import 'package:provider/provider.dart';
 import '../provider/category_provider.dart';
+import '../utils/app_snackbar.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final TransactionModel? transaction;
@@ -27,6 +28,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   TextEditingController _noteController = TextEditingController();
   TextEditingController _titleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  bool _isSaving = false;
 
   bool isIncome = true;
   CategoryModel? selectedCategory;
@@ -178,51 +181,67 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         
                   SizedBox(height: 20,),
         
-                  CustomButton(text:isEdit ? 'Update' : 'Save Transaction',
-                      onPressed: () async {
-        
-                    if(!_formKey.currentState!.validate()){
-                      return;
-                    }
-        
-                    if(selectedCategory == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a category')),
+                  Consumer<TransactionProvider>(
+                    builder: (context, provider, _) {
+                      return CustomButton(text:isEdit ? 'Update' : 'Save Transaction',
+                          isLoading: provider.isLoading,
+                          onPressed: () async {
+                            if (provider.isLoading) return;
+
+                            //Update
+                            if (isEdit) {
+                              final updateTransaction = TransactionModel(
+                                id: widget.transaction!.id,
+                                title: _titleController.text.trim(),
+                                date: selectedDate!,
+                                amount: double.parse(_amountController.text),
+                                isIncome: isIncome,
+                                categoryId: selectedCategory!.id,
+                                note: _noteController.text.trim(),
+                              );
+
+                              final success = await provider.updateTransaction(
+                                  updateTransaction);
+
+
+                              if (!context.mounted) return;
+
+                              if (success) {
+                                showAppSnackBar(context: context,
+                                    message: 'Transaction updated successfully');
+
+                                Navigator.pop(context, true);
+                              }
+                            } else {
+                              final transaction = TransactionModel(
+                                id: '',
+                                title: _titleController.text.trim(),
+                                date: selectedDate!,
+                                amount: double.parse(_amountController.text),
+                                isIncome: isIncome,
+                                categoryId: selectedCategory!.id,
+                                note: _noteController.text.trim(),
+                              );
+
+                              final success = await provider.addTransaction(
+                                  transaction);
+
+
+                              if (!context.mounted) return;
+
+                              if (success) {
+                                showAppSnackBar(context: context,
+                                    message: 'Transaction added successfully');
+
+                                Navigator.pop(context);
+                              }
+                            }
+
+
+                          }
                       );
-                      return;
                     }
-        
-                    if(selectedDate == null){
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a date')),
-                      );
-                      return;
-                    }
-        
-                    final transaction = TransactionModel(
-                        id: isEdit ? widget.transaction!.id : '',
-                        title: _titleController.text.trim(),
-                        date: selectedDate!,
-                        amount: double.parse(_amountController.text.trim()),
-                        isIncome: isIncome,
-                        categoryId: selectedCategory!.id,
-                        note: _noteController.text.trim()
-        
-                    );
-        
-                    //=== Add / Update===//
-        
-                    if(isEdit){
-                      await context.read<TransactionProvider>().updateTransaction(transaction);
-                    } else {
-                      await context.read<TransactionProvider>().addTransaction(transaction);
-                    }
-        
-                    if(!context.mounted) return;
-        
-                    Navigator.pop(context, true);
-        
-                  }),
+                  ),
         
                 ],
               ),
@@ -231,7 +250,93 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         ),
       ),
     );
+
   }
+
+
+
+  Future<void> _saveTransaction() async {
+    if (_isSaving) return;
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a category'),
+        ),
+      );
+      return;
+    }
+
+    if (selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a date'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      final transaction = TransactionModel(
+        id: widget.transaction?.id ?? '',
+        title: _titleController.text.trim(),
+        date: selectedDate!,
+        amount: double.parse(
+          _amountController.text.trim(),
+        ),
+        isIncome: isIncome,
+        categoryId: selectedCategory!.id,
+        note: _noteController.text.trim(),
+      );
+
+      if (widget.transaction != null) {
+        await context
+            .read<TransactionProvider>()
+            .updateTransaction(transaction);
+      } else {
+        await context
+            .read<TransactionProvider>()
+            .addTransaction(transaction);
+      }
+
+      if (!mounted) return;
+
+      showAppSnackBar(
+        context: context,
+        message: widget.transaction != null
+            ? 'Transaction updated successfully!'
+            : 'Transaction saved successfully!',
+      );
+
+      Navigator.pop(context, true);
+
+    } catch (e) {
+      if (!mounted) return;
+
+      showAppSnackBar(
+        context: context,
+        message: 'Something went wrong: $e',
+      );
+
+      print('SAVE TRANSACTION ERROR: $e');
+
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
+  
   @override
   void dispose() {
     _amountController.dispose();

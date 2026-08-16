@@ -4,7 +4,6 @@ import 'package:expense_tracker/screens/add_category_screen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
 import 'package:expense_tracker/widgets/custom_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/app_snackbar.dart';
@@ -63,73 +62,6 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-            SearchBar(
-            hintText: 'Search categories...',
-            hintStyle: WidgetStatePropertyAll(
-              GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
-              ),
-            ),
-
-            leading: const Icon(
-              Icons.search_rounded,
-              size: 22,
-            ),
-
-            trailing: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.tune_rounded,
-                ),
-              ),
-            ],
-
-            elevation: const WidgetStatePropertyAll(0),
-
-            backgroundColor: WidgetStatePropertyAll(
-              AppColors.white,
-            ),
-
-            surfaceTintColor: const WidgetStatePropertyAll(
-              Colors.transparent,
-            ),
-
-            shape: WidgetStateProperty.resolveWith<OutlinedBorder>((states) {
-              if (states.contains(WidgetState.focused)) {
-                return RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  side: BorderSide(
-                    color: AppColors.primary,
-                    width: 1.5,
-                  ),
-                );
-              }
-
-              return RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                ),
-              );
-            }),
-
-            padding: const WidgetStatePropertyAll(
-              EdgeInsets.symmetric(horizontal: 16),
-            ),
-
-            textStyle: WidgetStatePropertyAll(
-              GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-
-              SizedBox(height: 20),
               ListView.separated(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -145,6 +77,7 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
                     title: Text(category.name),
                     subtitle: Text(category.isIncome ? 'Income' : 'Expense'),
                     trailing:PopupMenuButton<String>(
+                      color: AppColors.background,
                         icon: const Icon(Icons.more_vert),
 
                         onSelected: (value) async {

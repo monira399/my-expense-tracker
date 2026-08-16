@@ -16,7 +16,8 @@ class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({
     super.key,
     required this.isIncome,
-    this.category, this.transaction,
+    this.category,
+    this.transaction,
   });
 
   @override
@@ -33,7 +34,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   void initState() {
     super.initState();
 
-    // Edit mode old data //
+    // Edit mode old data
     if (widget.category != null) {
       controller.text = widget.category!.name;
       selectedIcon = widget.category!.icon;
@@ -45,7 +46,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   Widget build(BuildContext context) {
     final icons = widget.isIncome ? incomeIcons : expenseIcons;
 
-    final isEdit = widget.category != null;
+    final bool isEdit = widget.category != null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -97,6 +98,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 itemBuilder: (context, index) {
                   final icon = icons[index];
 
+                  final bool isSelected = selectedIcon == icon;
+
                   return InkWell(
                     onTap: () {
                       setState(() {
@@ -106,14 +109,14 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
 
                     child: Container(
                       decoration: BoxDecoration(
-                        color: selectedIcon == icon
+                        color: isSelected
                             ? AppColors.primary.withOpacity(0.1)
                             : AppColors.white,
 
                         borderRadius: BorderRadius.circular(12),
 
                         border: Border.all(
-                          color: selectedIcon == icon
+                          color: isSelected
                               ? AppColors.primary
                               : Colors.grey.shade300,
                           width: 2,
@@ -123,7 +126,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                       child: Icon(
                         icon,
                         size: 30,
-                        color: selectedIcon == icon
+                        color: isSelected
                             ? AppColors.primary
                             : Colors.grey,
                       ),
@@ -133,76 +136,100 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
               ),
             ),
 
-            CustomButton(
-              text: isEdit ? 'Update' : 'Add',
+            const SizedBox(height: 16),
 
-              onPressed: () async {
+            Consumer<CategoryProvider>(
+              builder: (context, provider, _) {
+                return CustomButton(
+                  text: isEdit ? 'Update' : 'Add',
+                  isLoading: provider.isLoading,
 
-                // Category Name Validation
+                  onPressed: () async {
+                    // Prevent double click
+                    if (provider.isLoading) return;
 
-                if (controller.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Please enter category name',
-                      ),
-                    ),
-                  );
-                  return;
-                }
+                    // Name Validation
+                    if (controller.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please enter category name',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
 
-                // Icon Validation
+                    // Icon Validation
+                    if (selectedIcon == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please select an Icon',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
 
-                if (selectedIcon == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Please select an Icon',
-                      ),
-                    ),
-                  );
-                  return;
-                }
+                    // ================= ADD =================
 
-                // ADD
+                    if (!isEdit) {
+                      final category = CategoryModel(
+                        id: '',
+                        name: controller.text.trim(),
+                        icon: selectedIcon!,
+                        color: selectedColor,
+                        isIncome: widget.isIncome,
+                      );
 
-                if (!isEdit) {
-                  final category = CategoryModel(
-                    id: '',
-                    name: controller.text.trim(),
-                    icon: selectedIcon!,
-                    color: selectedColor,
-                    isIncome: widget.isIncome,
-                  );
+                      final success =
+                      await provider.addCategory(category);
 
-                  await context
-                      .read<CategoryProvider>()
-                      .addCategory(category);
+                      if (!context.mounted) return;
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
-                }
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Category added successfully',
+                            ),
+                          ),
+                        );
 
-                // UPDATE
-                else {
-                  final updatedCategory = CategoryModel(
-                    id: widget.category!.id,
-                    name: controller.text.trim(),
-                    icon: selectedIcon!,
-                    color: selectedColor,
-                    isIncome: widget.isIncome,
-                  );
+                        Navigator.pop(context);
+                      }
+                    }
 
-                  await context
-                      .read<CategoryProvider>()
-                      .updateCategory(updatedCategory);
+                    // ================= UPDATE =================
 
-                  if (context.mounted) {
-                    Navigator.pop(context, true);
+                    else {
+                      final updatedCategory = CategoryModel(
+                        id: widget.category!.id,
+                        name: controller.text.trim(),
+                        icon: selectedIcon!,
+                        color: selectedColor,
+                        isIncome: widget.isIncome,
+                      );
 
-                  }
-                }
+                      await provider.updateCategory(
+                        updatedCategory,
+                      );
+
+                      if (!context.mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Category updated successfully',
+                          ),
+                        ),
+                      );
+
+                      Navigator.pop(context, true);
+                    }
+                  },
+                );
               },
             ),
           ],

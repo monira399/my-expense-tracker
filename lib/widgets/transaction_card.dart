@@ -1,5 +1,6 @@
 import 'package:expense_tracker/models/transaction_model.dart';
 import 'package:expense_tracker/provider/category_provider.dart';
+import 'package:expense_tracker/screens/transaction_details_screen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,6 +26,9 @@ class TransactionCard extends StatelessWidget {
         .getCategoryById(transaction.categoryId);
 
     return ListTile(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionDetailsScreen(transaction: transaction)));
+      },
       leading: CircleAvatar(
         radius: 20,
         backgroundColor:
@@ -39,7 +43,7 @@ class TransactionCard extends StatelessWidget {
 
       title: Text(
         transaction.title,
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).textTheme.titleMedium,
       ),
 
       subtitle: Text(
@@ -63,6 +67,7 @@ class TransactionCard extends StatelessWidget {
           const SizedBox(width: 15),
 
           PopupMenuButton<String>(
+            color: AppColors.background,
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.more_vert),
 

@@ -19,6 +19,7 @@ class TransactionProvider extends ChangeNotifier {
 
   Future<void> getTransaction() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -33,13 +34,29 @@ class TransactionProvider extends ChangeNotifier {
 
   // ============ Add Transaction ============
 
-  Future<void> addTransaction(TransactionModel transaction) async {
+  Future<bool> addTransaction(TransactionModel transaction) async {
     try {
-      await _transactionService.addTransaction(transaction);
+      _isLoading = true;
+      notifyListeners();
 
+      final id = await _transactionService.addTransaction(transaction);
+
+      final newTransaction = TransactionModel(
+        id: id,
+        title: transaction.title,
+        date: transaction.date,
+        amount: transaction.amount,
+        isIncome: transaction.isIncome,
+        categoryId: transaction.categoryId,
+        note: transaction.note,
+      );
+
+      _transactions.insert(0, newTransaction);
       await getTransaction();
+
+      return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -48,13 +65,20 @@ class TransactionProvider extends ChangeNotifier {
 
   // ============ Update Transaction ============
 
-  Future<void> updateTransaction(TransactionModel transaction) async {
+  Future<bool> updateTransaction(TransactionModel transaction) async {
+
     try {
+      _isLoading = true;
+      notifyListeners();
+
       await _transactionService.updateTransaction(transaction);
 
       await getTransaction();
+
+      return true;
     } catch (e) {
       _errorMessage = e.toString();
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -67,12 +91,13 @@ class TransactionProvider extends ChangeNotifier {
     try {
       await _transactionService.deleteTransaction(transactionId);
 
+      _transactions.removeWhere(
+            (transaction) => transaction.id == transactionId,
+      );
       await getTransaction();
-    } catch (e) {
-      _errorMessage = e.toString();
-    } finally {
-      _isLoading = false;
       notifyListeners();
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -97,7 +122,9 @@ class TransactionProvider extends ChangeNotifier {
   // ============ Yesterday Transactions ============
 
   List<TransactionModel> get yesterdayTransactions {
-    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    final yesterday = DateTime.now().subtract(
+      const Duration(days: 1),
+    );
 
     return _transactions.where((transaction) {
       return transaction.date.year == yesterday.year &&
@@ -116,15 +143,17 @@ class TransactionProvider extends ChangeNotifier {
 
       final isToday =
           transactionDate.year == now.year &&
-          transactionDate.month == now.month &&
-          transactionDate.day == now.day;
+              transactionDate.month == now.month &&
+              transactionDate.day == now.day;
 
-      final yesterday = now.subtract(const Duration(days: 1));
+      final yesterday = now.subtract(
+        const Duration(days: 1),
+      );
 
       final isYesterday =
           transactionDate.year == yesterday.year &&
-          transactionDate.month == yesterday.month &&
-          transactionDate.day == yesterday.day;
+              transactionDate.month == yesterday.month &&
+              transactionDate.day == yesterday.day;
 
       return !isToday && !isYesterday;
     }).toList();
@@ -133,50 +162,89 @@ class TransactionProvider extends ChangeNotifier {
   // ============ Date + Type Filter ============
 
   List<TransactionModel> getTransactionsByDateAndType(
-    String dateType,
-    int selected,
-  ) {
+      String dateType,
+      int selected, {
+        List<TransactionModel>? searchResult,
+      }) {
     List<TransactionModel> result;
 
-    // ============ Date Filter ============
 
+    final data = searchResult ?? transactions;
+
+    // Date Filter
     if (dateType == 'today') {
-      result = todayTransactions;
+      result = data.where((transaction) {
+        return DateUtils.isSameDay(
+          transaction.date,
+          DateTime.now(),
+        );
+      }).toList();
     } else if (dateType == 'yesterday') {
-      result = yesterdayTransactions;
+      final yesterday = DateTime.now().subtract(
+        const Duration(days: 1),
+      );
+
+      result = data.where((transaction) {
+        return DateUtils.isSameDay(
+          transaction.date,
+          yesterday,
+        );
+      }).toList();
     } else {
-      result = olderTransactions;
+      result = data.where((transaction) {
+        final today = DateTime.now();
+        final yesterday = today.subtract(
+          const Duration(days: 1),
+        );
+
+        return !DateUtils.isSameDay(transaction.date, today) &&
+            !DateUtils.isSameDay(transaction.date, yesterday);
+      }).toList();
     }
 
-    // ============ All / Income / Expense ============
-
+    // All / Income / Expense
     if (selected == 0) {
       return result;
     } else if (selected == 1) {
-      return result.where((transaction) => transaction.isIncome).toList();
+      return result
+          .where((transaction) => transaction.isIncome)
+          .toList();
     } else {
-      return result.where((transaction) => !transaction.isIncome).toList();
+      return result
+          .where((transaction) => !transaction.isIncome)
+          .toList();
     }
   }
 
-  //====Total Income====//
+  // ============ Total Income ============
+
   double get totalIncome {
     return _transactions
         .where((transaction) => transaction.isIncome)
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(
+      0.0,
+          (sum, transaction) => sum + transaction.amount,
+    );
   }
-  //====Total Expense====//
+
+  // ============ Total Expense ============
+
   double get totalExpense {
     return _transactions
         .where((transaction) => !transaction.isIncome)
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(
+      0.0,
+          (sum, transaction) => sum + transaction.amount,
+    );
   }
-  //====Current Balance====//
+
+  // ============ Current Balance ============
+
   double get currentBalance {
     return totalIncome - totalExpense;
-}
+  }
 
-  //==========Today Income Filter================//
+  // ============ Today Income ============
 
   double get todayIncome {
     final now = DateTime.now();
@@ -190,54 +258,147 @@ class TransactionProvider extends ChangeNotifier {
           date.day == now.day &&
           transaction.isIncome;
     })
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(
+      0.0,
+          (sum, transaction) => sum + transaction.amount,
+    );
   }
 
-  //==========Today Expense Filter================//
+  // ============ Today Expense ============
+
   double get todayExpense {
     final now = DateTime.now();
 
-    return _transactions.where((transaction) {
+    return _transactions
+        .where((transaction) {
       final date = transaction.date;
 
       return date.year == now.year &&
-         date.month == now.month &&
-         date.day == now.day &&
-      !transaction.isIncome;
+          date.month == now.month &&
+          date.day == now.day &&
+          !transaction.isIncome;
     })
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(
+      0.0,
+          (sum, transaction) => sum + transaction.amount,
+    );
   }
 
-  // This Month Income
+  // ============ This Month Income ============
+
   double get thisMonthIncome {
     final now = DateTime.now();
 
-    return _transactions.where((transaction) {
+    return _transactions
+        .where((transaction) {
       final date = transaction.date;
 
       return date.year == now.year &&
           date.month == now.month &&
           transaction.isIncome;
     })
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
-
-
+        .fold(
+      0.0,
+          (sum, transaction) => sum + transaction.amount,
+    );
   }
 
-  // This Month Expense
+  // ============ This Month Expense ============
+
   double get thisMonthExpense {
     final now = DateTime.now();
 
-    return _transactions.where((transaction) {
+    return _transactions
+        .where((transaction) {
       final date = transaction.date;
 
       return date.year == now.year &&
           date.month == now.month &&
           !transaction.isIncome;
     })
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
-
-
+        .fold(
+      0.0,
+          (sum, transaction) => sum + transaction.amount,
+    );
   }
 
+  // ============ Monthly Report ============
+
+  Map<String, Map<String, double>> getMonthlyReport() {
+    final now = DateTime.now();
+
+    final Map<String, Map<String, double>> report = {};
+
+    for (int i = 5; i >= 0; i--) {
+      final date = DateTime(
+        now.year,
+        now.month - i,
+        1,
+      );
+
+      final monthKey =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}';
+
+      double income = 0;
+      double expense = 0;
+
+      for (final transaction in _transactions) {
+        if (transaction.date.year == date.year &&
+            transaction.date.month == date.month) {
+          if (transaction.isIncome) {
+            income += transaction.amount;
+          } else {
+            expense += transaction.amount;
+          }
+        }
+      }
+
+      report[monthKey] = {
+        'income': income,
+        'expense': expense,
+      };
+    }
+
+    return report;
+  }
+
+  // ============ Top Spending Categories ============
+
+  Map<String, double> getTopSpendingCategories() {
+    final Map<String, double> categoryTotal = {};
+
+    for (final transaction in _transactions) {
+      if (!transaction.isIncome) {
+        categoryTotal[transaction.categoryId] =
+            (categoryTotal[transaction.categoryId] ?? 0) +
+                transaction.amount;
+      }
+    }
+    
+    final sortedCategories = categoryTotal.entries.toList();
+    
+    sortedCategories.sort(
+        (a, b) => b.value.compareTo(a.value),
+    );
+
+    return Map.fromEntries(sortedCategories);
+  }
+
+  List<TransactionModel> searchTransactions(String query) {
+    if(query.trim().isEmpty) {
+      return _transactions;
+    }
+
+    return _transactions.where((transaction) {
+      return transaction.title
+          .toLowerCase()
+          .contains(query.toLowerCase());
+    }).toList();
+  }
+
+  void clearData() {
+    _transactions.clear();
+    _errorMessage = null;
+    notifyListeners();
+  }
 }

@@ -34,13 +34,20 @@ class CategoryProvider extends ChangeNotifier {
 
   //Add Category
 
- Future<void> addCategory(CategoryModel category) async {
+ Future<bool> addCategory(CategoryModel category) async {
     try {
-      await _categoryService.addCategory(category);
+      _isLoading =true;
+      notifyListeners();
 
+      await _categoryService.addCategory(category);
       await getCategories();
+
+      return true;
     } catch (e) {
       _errorMessage = e.toString();
+      return false;
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
  }
@@ -81,6 +88,11 @@ Future<void> deleteCategory (String categoryId) async {
     } catch (e) {
       return null;
     }
+  }
+  void clearData() {
+    _categories.clear();
+    _errorMessage = null;
+    notifyListeners();
   }
 
 }

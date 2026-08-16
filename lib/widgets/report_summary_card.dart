@@ -24,7 +24,7 @@ class ReportSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      height: 150,
       width: 300,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -42,12 +42,12 @@ class ReportSummaryCard extends StatelessWidget {
         children: [
           /// Icon
           CircleAvatar(
-            radius: 15,
+            radius: 28,
             backgroundColor: iconBackgroundColor,
             child: Icon(
               icon,
               color: iconColor,
-              size: 18,
+              size: 20,
             ),
           ),
 
@@ -57,7 +57,7 @@ class ReportSummaryCard extends StatelessWidget {
           Text(
             title,
             style: GoogleFonts.poppins(
-              fontSize: 10,
+              fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Colors.black,
             ),
@@ -69,7 +69,7 @@ class ReportSummaryCard extends StatelessWidget {
           Text(
             '৳ ${amount.toStringAsFixed(0)}',
             style: GoogleFonts.poppins(
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               color: amountColor,
             ),

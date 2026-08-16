@@ -49,6 +49,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     SizedBox(height: 20),
 
                     CustomTextField(
+                      controller: _fullNameController,
+                      hintText: 'Full Name',
+                      prefixIcon: Icons.email,
+                      height: 55,
+                      width: double.infinity,
+                        validator: (String? value){
+                          if(value?.trim().isEmpty ?? true){
+                            return 'Enter name';
+                          }
+                          return null;
+                        }
+                    ),
+
+                    SizedBox(height: 20),
+
+                    CustomTextField(
                       controller: _emailController,
                       hintText: 'Email',
                       prefixIcon: Icons.email,
@@ -165,6 +181,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await authProvider.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        name: _fullNameController.text.trim(),
       );
 
       if (!mounted) return;

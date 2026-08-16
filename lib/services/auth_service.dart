@@ -4,24 +4,29 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<UserCredential> signUp({
+    required String name,
     required String email,
     required String password,
   }) async {
-    return await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password
+    final userCredential =  await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
     );
+
+    await userCredential.user?.updateDisplayName(name);
+
+    await userCredential.user?.reload();
+    return userCredential;
   }
 
   Future<UserCredential> login({
     required String email,
     required String password,
-}) async {
+  }) async {
     return await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password
+      email: email,
+      password: password,
     );
-
   }
 
   Future<void> logOut() async {
@@ -29,10 +34,10 @@ class AuthService {
   }
 
   User? getCurrentUser() {
-    return _auth.currentUser;}
+    return _auth.currentUser;
+  }
 
   Future<void> resetPassword(String email) {
-    return _auth.sendPasswordResetEmail(email: email,
-    );
+    return _auth.sendPasswordResetEmail(email: email);
   }
 }

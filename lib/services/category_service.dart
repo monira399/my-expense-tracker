@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/models/category_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 class CategoryService {
@@ -8,7 +9,8 @@ class CategoryService {
   // Add Category
 
 Future<void> addCategory(CategoryModel category) async {
-  await _firestore.collection('categories').add({
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  await _firestore.collection('users').doc(uid).collection('categories').add({
     'name':category.name,
     'iconCode': category.icon.codePoint,
     'fontFamily': category.icon.fontFamily,
@@ -20,7 +22,8 @@ Future<void> addCategory(CategoryModel category) async {
 //Read/Get Categories
 
 Future<List<CategoryModel>> getCategories() async {
-  final snapShot = await _firestore.collection('categories').get();
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final snapShot = await _firestore.collection('users').doc(uid).collection('categories').get();
 
   return snapShot.docs.map((doc){
     final data = doc.data();
@@ -41,7 +44,10 @@ Future<List<CategoryModel>> getCategories() async {
 //Update Category
 
 Future<void> updateCategory(CategoryModel category) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
   await _firestore
+      .collection('users')
+      .doc(uid)
       .collection('categories')
       .doc(category.id)
       .update({
@@ -55,7 +61,10 @@ Future<void> updateCategory(CategoryModel category) async {
 //Delete Category
 
 Future<void> deleteCategory(String categoryId) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
   await _firestore
+      .collection('users')
+      .doc(uid)
       .collection('categories')
       .doc(categoryId)
       .delete();

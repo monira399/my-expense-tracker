@@ -10,6 +10,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> signUp({
+    required String name,
     required String email,
     required String password,
   }) async {
@@ -19,7 +20,8 @@ class AuthProvider extends ChangeNotifier {
     try {
       await _authService.signUp(
           email: email,
-          password: password);
+          password: password,
+          name: name);
     } on FirebaseAuthException catch (e) {
       print('Code: ${e.code}');
       print('Message: ${e.message}');

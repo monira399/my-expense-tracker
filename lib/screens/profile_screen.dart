@@ -1,9 +1,12 @@
+import 'package:expense_tracker/provider/profile_provider.dart';
+import 'package:expense_tracker/services/auth_service.dart';
 import 'package:expense_tracker/utils/app_color.dart';
 import 'package:expense_tracker/widgets/custom_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
+import '../provider/transaction_provider.dart';
+import '../provider/category_provider.dart';
 import '../models/profile_model.dart';
 import '../provider/auth_provider.dart';
 import 'login_screen.dart';
@@ -16,8 +19,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
+
   @override
   Widget build(BuildContext context) {
+    final user = AuthService().getCurrentUser();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -50,30 +56,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 45,
-                          backgroundColor:
-                          AppColors.secondary.withOpacity(.7),
-                          child: const Icon(
-                            Icons.person_outline,
-                            size: 45,
-                          ),
+                        Consumer<ProfileProvider>(
+                          builder: (context, provider, _) {
+                            return CircleAvatar(
+                              radius: 45,
+                              backgroundImage: provider.selectedImage != null ? FileImage(provider.selectedImage!) : null,
+                              backgroundColor:
+                              AppColors.secondary.withOpacity(.7),
+                              child: provider.selectedImage == null ?
+                              const Icon(
+                                Icons.person_outline,
+                                size: 45,
+                              )
+                              : null
+                            );
+                          }
                         ),
 
                         Positioned(
-                          right: 0,
-                          bottom: 0,
+                          right: -2,
+                          bottom: -2,
                           child: Container(
+                            height: 28,
+                            width: 28,
                             padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: AppColors.secondary,
                               shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white,
+                              width: 2)
                             ),
-                            child: const Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                              size: 15,
-                            ),
+                            child: IconButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: (){
+                              context.read<ProfileProvider>().pickProfileImage();
+                            } ,
+                                icon: Icon(Icons.camera_alt, size: 15,color: Colors.white,)),
                           ),
                         ),
                       ],
@@ -82,15 +100,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 15),
 
                     Text(
-                      'Monira Parven',
-                      style: Theme.of(context).textTheme.titleMedium,
+                      user?.displayName ?? 'User',
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
 
                     const SizedBox(height: 5),
 
                     Text(
-                      'monir@gmail.com',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      user?.email ?? '',
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
 
                     const SizedBox(height: 18),
@@ -164,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         profileMenu.title,
                         style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           fontSize: 15,
                           color: profileMenu.iconColor ?? Colors.black
                         ),
@@ -172,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       subtitle:profileMenu.subTitle == null
                       ? null :
                       Text(profileMenu.subTitle!,style: GoogleFonts.poppins(
-                        fontSize: 12
+                        fontSize: 13
                       ),),
                       trailing: const Icon(
                         Icons.arrow_forward_ios,
@@ -211,9 +229,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               if(!mounted) return;
 
+              context.read<TransactionProvider>().clearData();
+              context.read<CategoryProvider>().clearData();
+
               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginScreen()), (predicate) => false);
             });
       },
     );
   }
+
 }

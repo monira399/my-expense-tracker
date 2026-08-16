@@ -1,13 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/models/transaction_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TransactionService {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   //Add Category
 
-Future<void> addTransaction(TransactionModel transaction) async {
-  await _fireStore.collection('transactions').add({
+Future<String> addTransaction(TransactionModel transaction) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final docRef = await _fireStore
+      .collection('users')
+      .doc(uid)
+      .collection('transactions')
+      .add({
     'title': transaction.title,
     'date': transaction.date,
     'amount': transaction.amount,
@@ -16,39 +23,50 @@ Future<void> addTransaction(TransactionModel transaction) async {
     'note': transaction.note
   });
 
+  return docRef.id;
+
 }
 
 
-  //Get Category
 
-Future<List<TransactionModel>> getTransaction() async {
-  final snapShot = await _fireStore.collection('transactions').get();
 
-  final transaction = snapShot.docs.map((doc) {
-    final data = doc.data();
+  //Get Transactions
 
-    return TransactionModel(
+  Future<List<TransactionModel>> getTransaction() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final snapShot = await _fireStore
+        .collection('users')
+        .doc(uid)
+        .collection('transactions')
+        .get();
+
+    final transactions = snapShot.docs.map((doc) {
+      final data = doc.data();
+
+      return TransactionModel(
         id: doc.id,
         title: data['title'],
         date: (data['date'] as Timestamp).toDate(),
         amount: (data['amount'] as num).toDouble(),
         isIncome: data['isIncome'],
         categoryId: data['categoryId'],
-        note: data['note']
+        note: data['note'],
+      );
+    }).toList();
+
+    transactions.sort(
+          (a, b) => b.date.compareTo(a.date),
     );
-  }).toList();
 
-  transaction.sort(
-      (a, b) => b.date.compareTo(a.date)
-  );
-
-  return transaction;
-}
+    return transactions;
+  }
 
   //Update Category
 
 Future<void> updateTransaction(TransactionModel transaction) async {
-  await _fireStore.collection('transactions').doc(transaction.id).update({
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  await _fireStore.collection('users').doc(uid).collection('transactions').doc(transaction.id).update({
     'title': transaction.title,
     'date': transaction.date,
     'amount': transaction.amount,
@@ -61,6 +79,7 @@ Future<void> updateTransaction(TransactionModel transaction) async {
   //Delete Category
 
 Future<void> deleteTransaction(String transactionId) async {
-  await _fireStore.collection('transactions').doc(transactionId).delete();
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  await _fireStore.collection('users').doc(uid).collection('transactions').doc(transactionId).delete();
 }
 }

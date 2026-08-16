@@ -1,8 +1,10 @@
 
+import 'package:expense_tracker/provider/auth_provider.dart';
 import 'package:expense_tracker/provider/category_provider.dart';
 import 'package:expense_tracker/screens/transaction_screen.dart';
 import 'package:expense_tracker/utils/app_color.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../provider/transaction_provider.dart';
 import '../widgets/current_balanced_card.dart';
@@ -22,7 +24,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
 
     Future.microtask(() {
-      context.read<TransactionProvider>().getTransaction();
+      context.watch<TransactionProvider>().getTransaction();
+      context.read<CategoryProvider>().getCategories();
     });
   }
 
@@ -30,6 +33,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final transactionProvider = context.watch<TransactionProvider>();
     final recentTransactions = context.watch<TransactionProvider>().recentTransactions;
+
+    final user = context.read<AuthProvider>().getCurrentUser();
 
 
     return Scaffold(
@@ -60,9 +65,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 4),
                 ],
               ),
-              Text('Munira', style: Theme.of(context).textTheme.titleMedium),
+              Text(user?.displayName ?? 'user', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 2),
-              Text('Today. 30 july, 2026', style: Theme.of(context).textTheme.bodySmall,),
+              Text(DateFormat('EEE, dd MMM yyyy').format(DateTime.now()), style: Theme.of(context).textTheme.bodyMedium,),
 
               SizedBox(height: 15),
 
@@ -120,7 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       title: 'Income',
                       amount: transactionProvider.thisMonthIncome,
                       percentage: '',
-                      subTitle: 'this month',
+                      subTitle: 'In this month',
                       icon: Icons.calendar_month_outlined,
                       iconColor: Colors.green,
                       iconBackgroundColor: AppColors.secondary.withOpacity(0.2),
@@ -133,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       title: 'Expense',
                       amount: transactionProvider.thisMonthExpense,
                       percentage: '',
-                      subTitle: 'this month',
+                      subTitle: 'In this month',
                       icon: Icons.calendar_month_outlined,
                       iconColor: Colors.red,
                       iconBackgroundColor: const Color(0xffFDEBEC),

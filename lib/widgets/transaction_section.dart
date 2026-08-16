@@ -17,20 +17,36 @@ class TransactionSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
-
-        SizedBox(height: 10),
-
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: transactions.length,
-          itemBuilder: (context, index) {
-            final transaction = transactions[index];
-
-            return TransactionCard(transaction: transaction);
-          },
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
+
+        const SizedBox(height: 10),
+
+        if (transactions.isEmpty)
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              child: Text(
+                'Transaction Empty\nPlease add any transaction',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: transactions.length,
+            itemBuilder: (context, index) {
+              return TransactionCard(
+                transaction: transactions[index],
+              );
+            },
+          ),
       ],
     );
   }

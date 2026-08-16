@@ -13,6 +13,7 @@ class TransactionScreen extends StatefulWidget {
 }
 
 class _TransactionScreenState extends State<TransactionScreen> {
+  final TextEditingController searchController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -27,9 +28,14 @@ class _TransactionScreenState extends State<TransactionScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<TransactionProvider>();
 
-    final today = provider.getTransactionsByDateAndType('today', isSelectedFilter);
-    final yesterday = provider.getTransactionsByDateAndType('yesterday', isSelectedFilter);
-    final older = provider.getTransactionsByDateAndType('older', isSelectedFilter);
+    print('ALL TRANSACTIONS: ${provider.transactions.length}');
+
+    final searchedTransactions =
+    provider.searchTransactions(searchController.text);
+
+    final today = provider.getTransactionsByDateAndType('today', isSelectedFilter, searchResult: searchedTransactions);
+    final yesterday = provider.getTransactionsByDateAndType('yesterday', isSelectedFilter,searchResult: searchedTransactions);
+    final older = provider.getTransactionsByDateAndType('older', isSelectedFilter, searchResult: searchedTransactions);
 
 
     return Scaffold(
@@ -46,10 +52,16 @@ class _TransactionScreenState extends State<TransactionScreen> {
           child: Column(
             children: [
               SearchBar(
-                hintText: 'Search categories...',
+                controller: searchController,
+                onChanged: (value) {
+                  setState(() {
+
+                  });
+                },
+                hintText: 'Search transaction...',
                 hintStyle: WidgetStatePropertyAll(
                   GoogleFonts.poppins(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey,
                   ),
@@ -105,8 +117,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
                 textStyle: WidgetStatePropertyAll(
                   GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
@@ -208,6 +220,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                       ),
                     ),
                   ),
+
                 ],
               ),
 
@@ -277,5 +290,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 }
