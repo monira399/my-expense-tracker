@@ -76,7 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: double.infinity,
                 title: 'Current Balance',
                 amount: transactionProvider.currentBalance,
-                date: '26 july, 2026',
+                date:DateFormat('EEE, dd MMM yyyy').format(DateTime.now()),
                 fontSize: 20,
                 fontColor: Colors.white,
                 icon: Icons.account_balance_wallet_outlined,
